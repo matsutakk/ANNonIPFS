@@ -20,7 +20,7 @@ export default function Header() {
         <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
             {currentPath === "/" && <p>Search NFT with ChatGPT</p>}
             {currentPath === "/docs" && <p>Documentation</p>}
-            {currentPath === "/contributes" && <p>Contribute vectorDB indexes</p>}
+            {currentPath === "/contributions" && <p>Contribute vectorDB indexes</p>}
         </span>
       </Navbar.Brand>
       <Navbar.Toggle />
@@ -38,10 +38,10 @@ export default function Header() {
           Docs
         </Navbar.Link>
         <Navbar.Link
-          href="/contributes"
-          active={currentPath == "/contributes"}
+          href="/contributions"
+          active={currentPath == "/contributions"}
         >
-          Contributes
+          Contributions
         </Navbar.Link>
       </Navbar.Collapse>
     </Navbar>

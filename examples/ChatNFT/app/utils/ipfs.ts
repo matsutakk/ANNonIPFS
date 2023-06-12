@@ -28,11 +28,8 @@ export async function storeFiles (files: File[]) {
 }
 
 export function makeFileObjects () {
-  // const obj = { hello: 'world' }
-  // const blob = new Blob([JSON.stringify(obj)], { type: 'applic ation/json' })
   const files = [
     new File(['contents-of-file-1'], 'plain-utf8.txt'),
-    // new File([blob], 'hello.json')
   ]
   return files
 }

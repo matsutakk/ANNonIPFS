@@ -30,7 +30,7 @@ export async function POST(request: Request) {
   // const cid = await fetchCID(message);
 
   // get meta data from IPFS
-  const res = await retrieveFromIPFS("");
+  const res = await retrieveFromIPFS("QmWiQE65tmpYzcokCheQmng2DCM33DEhjXcPB6PanwpAZo/1");
   console.log(res);
 
   const decoder = new TextDecoder();
@@ -59,6 +59,7 @@ export async function POST(request: Request) {
     以下のルールを守って回答を作成してください。
     ルール1 マッチングNFT情報はjsonなので、そのまま返さず、一般成人が理解できるような自然言語にしてください。
     ルール2 マッチングNFT情報にimageリンクがある場合、そのリンクを返してください。
+    ルール3 私のこの入力の言葉遣いは参考にせず、なるべく自然な言葉で返してください。
 
     マッチングNFT情報:
     {context}
@@ -66,11 +67,11 @@ export async function POST(request: Request) {
   });
 
   const prompt = await promptTemplate.format({ context:context, message:message});
-
+  
   const payload: OpenAIStreamPayload = {
     model: 'gpt-3.5-turbo',
     messages: [{ role: 'user', content: prompt }],
-    temperature: 0.7,
+    temperature: 0.4,
     top_p: 1,
     frequency_penalty: 0,
     presence_penalty: 0,
