@@ -4,7 +4,6 @@ import { Button, TextInput } from 'flowbite-react';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { ApiPromise } from "@polkadot/api";
 import { WsProvider } from "@polkadot/rpc-provider";
-// import { options } from "@astar-network/astar-api";
 import { BN, BN_ONE } from "@polkadot/util";
 import { Abi, ContractPromise } from "@polkadot/api-contract";
 import type { WeightV2 } from '@polkadot/types/interfaces'
@@ -16,42 +15,96 @@ const PROOFSIZE = new BN(1_000_000);
 const storageDepositLimit = null;
 
 export default function Home() {
-    const [data, setData] = useState("");
     const [address, setAddress] = useState('');
     const [account, setAccount] = useState<InjectedAccountWithMeta | null>(null);;
     const [source, setSource] = useState('');
-    const [firstInput, setFirstInput] = useState("");
-    const [secondInput, setSecondInput] = useState("");
+    const [metadata, setMetadata] = useState("");
+    const [cid, setCID] = useState("");
 
     const handleFirstInputChange = (e:ChangeEvent<HTMLInputElement>) => {
-        setFirstInput(e.target.value);
+        setMetadata(e.target.value);
     }
 
     const handleSecondInputChange = (e:ChangeEvent<HTMLInputElement>) => {
-        setSecondInput(e.target.value);
+        setCID(e.target.value);
     }
 
-    const handleFirstButtonClick = () => {
+    const handleFirstButtonClick = async () => {
         console.log('First Button clicked');
+        const response = await fetch('/api/addindex', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                metadata: metadata,
+                cid: cid,
+            }),
+        })
+      
+        if (!response.ok) {
+            throw new Error(response.statusText)
+        }
+
+        const data = await response.json();
+
+        console.log("hereeee");
+        data.hash = parseInt(data.hash.split('').join(''), 2);
+        console.log(data);
+
+        // sign and send tx
+        const injector = await web3FromSource(account.meta.source);
+        const provider = new WsProvider('wss://rpc.shibuya.astar.network');
+        const api = new ApiPromise({ provider });
+        await api.isReady;
+        const abi = new Abi(ABI, api.registry.getChainProperties());
+        const contract = new ContractPromise(api, abi, "aLVQp8h5wbRoKFXsbCZtwQmRN8ygriZhGuphLeqsf6WKKN5");
+        const { gasRequired } = await contract.query.addData(
+                address,
+                {
+                    gasLimit: api?.registry.createType('WeightV2', {
+                    refTime: MAX_CALL_WEIGHT,
+                    proofSize: PROOFSIZE,
+                    }) as WeightV2,
+                    storageDepositLimit,
+                },
+                data.hash,
+                cid,
+            );
+        const gasLimit = api?.registry.createType('WeightV2', gasRequired) as WeightV2   
+        await contract.tx
+            .addData({
+                gasLimit,
+                storageDepositLimit
+            }, data.hash, cid)
+            .signAndSend(address, {signer:injector.signer}, async (res) => {
+                if (res.status.isInBlock) {
+                    console.log('in a block')
+                } else if (res.status.isFinalized) {
+                    alert('Thank you for your contribution!');
+                }
+            });
     }
 
     const handleSecondButtonClick = async () => {
         console.log('Second Button clicked');
         
         // make LSH
-        let plane = [];
-        for (let j = 0; j < 1536; j++) {
-          plane.push(Math.floor(Math.random() - 0.5)*1000);
+        let randomVec: Float32Array = new Float32Array(1536);
+        for (let i: number = 0; i < 1536; i++) {
+            randomVec[i] = Math.random() - 0.5;
         }
+        let uint: Uint8Array = new Uint8Array(randomVec.buffer);
+        let plane: string = btoa( String.fromCharCode.apply( null, Array.from(uint) ) );
+
 
         // sign and send tx
         const injector = await web3FromSource(account.meta.source);
-        console.log("injector",injector)
         const provider = new WsProvider('wss://rpc.shibuya.astar.network');
         const api = new ApiPromise({ provider });
         await api.isReady;
         const abi = new Abi(ABI, api.registry.getChainProperties());
-        const contract = new ContractPromise(api, abi, "ZMQ7DzDwhqMjnbuPt5EnkVXUTnDfRDAmdh7kXwdMp6bcHTp");
+        const contract = new ContractPromise(api, abi, "aLVQp8h5wbRoKFXsbCZtwQmRN8ygriZhGuphLeqsf6WKKN5");
         const { gasRequired } = await contract.query.registerLsh(
             address,
             {
@@ -65,17 +118,17 @@ export default function Home() {
           );
         const gasLimit = api?.registry.createType('WeightV2', gasRequired) as WeightV2   
         await contract.tx
-        .registerLsh({
-            gasLimit,
-            storageDepositLimit
-        }, plane)
-        .signAndSend(address, {signer:injector.signer}, async (res) => {
-            if (res.status.isInBlock) {
-                console.log('in a block')
-            } else if (res.status.isFinalized) {
-                console.log('finalized')
-            }
-        });
+            .registerLsh({
+                gasLimit,
+                storageDepositLimit
+            }, plane)
+            .signAndSend(address, {signer:injector.signer}, async (res) => {
+                if (res.status.isInBlock) {
+                    console.log('in a block')
+                } else if (res.status.isFinalized) {
+                    alert('Thank you for your contribution!');
+                }
+            });
     }
 
     useEffect(() =>  {
@@ -100,38 +153,16 @@ export default function Home() {
       
           console.log("address",address)
           console.log("source",source)
-      
+
           setAddress(address);
           setSource(source);
         }
-
-        const connectNode = async () => {
-            // const provider = new WsProvider('wss://rpc.shibuya.astar.network');
-            // const api = new ApiPromise({ provider });
-            // await api.isReady;
-            // const abi = new Abi(ABI, api.registry.getChainProperties());
-
-            // const contract = new ContractPromise(api, abi, "ZMQ7DzDwhqMjnbuPt5EnkVXUTnDfRDAmdh7kXwdMp6bcHTp");
-
-            // const { result, output } = await contract.query.getTotalLsh(
-            //   address,
-            //   {
-            //     gasLimit: api?.registry.createType('WeightV2', {
-            //       refTime: MAX_CALL_WEIGHT,
-            //       proofSize: PROOFSIZE,
-            //     }) as WeightV2,
-            //     storageDepositLimit,
-            //   }
-            // );
-            // console.log(result.toHuman(), output?.toHuman());
-        }
         connectWallet();
-        connectNode();
     },[]);
 
   return (
     <main>
-        <div className="mb-10 p-6 max-w-sm mx-auto bg-white rounded-xl shadow-md flex flex-col items-center space-x-4">
+        <div className="mb-10 p-6 max-w-md mx-auto bg-white rounded-xl shadow-md flex flex-col items-center space-x-4">
             <div className="flex-1  w-full">
                 <div className="mb-4">
                     <p className="text-lg mb-2">Please input data for vectorDB index</p>
@@ -139,8 +170,8 @@ export default function Home() {
                         id="firstInput"
                         type="text"
                         className="mt-1 block w-full"
-                        placeholder="Enter feature vector"
-                        value={firstInput}
+                        placeholder="Enter nft metadata"
+                        value={metadata}
                         onChange={(e) => handleFirstInputChange(e)}
                     />
 
@@ -149,7 +180,7 @@ export default function Home() {
                         type="text"
                         className="mt-1 block w-full"
                         placeholder="Enter content address"
-                        value={secondInput}
+                        value={cid}
                         onChange={(e) => handleSecondInputChange(e)}
                     />
                 </div>
