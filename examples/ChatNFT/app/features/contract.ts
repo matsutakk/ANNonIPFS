@@ -8,7 +8,7 @@ import { generateLshParams } from "./lsh";
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 
 const address = '5GNZgSUpbh1oeNUizq959yH52mvH7gokg4hiVijHiFBSpWCR';
-const contractAddress = "aLVQp8h5wbRoKFXsbCZtwQmRN8ygriZhGuphLeqsf6WKKN5"
+const contractAddress = "XXNLRXn4q3CFJG6ZargEg7Y4tbZX32mTMsuogUVmEwx81tJ"
 const providerUrl = 'wss://rpc.shibuya.astar.network'
 
 const MAX_CALL_WEIGHT = new BN(5_000_000_000_000).isub(BN_ONE);
