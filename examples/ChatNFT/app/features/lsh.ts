@@ -13,12 +13,21 @@ const gaussianRandom = (mean=0, stdev=1) => {
   return z * stdev + mean;
 }
 
-export function generateLshParams(dim: number){
+export function generateLshParams(dim: number) {
   const plane: number[] = [];
   for(let j = 0; j < dim; j++){
     plane.push(gaussianRandom());
   }
-  return plane;
+
+  const buffer = new ArrayBuffer(plane.length * 4); // 4 bytes for each float32
+  const view = new DataView(buffer);
+  for(let i = 0; i < plane.length; i++) {
+    view.setFloat32(i * 4, plane[i]); // store as float32
+  }
+
+  console.log(plane);
+
+  return new Uint8Array(buffer); // this returns bytes array instead of number array
 }
 
 export async function lshQuery(featureVector: number[], params: number[][]): Promise<string>{

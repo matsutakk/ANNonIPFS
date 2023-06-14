@@ -51,12 +51,7 @@ export const addLshToBlockchain = async (account:InjectedAccountWithMeta, featur
 
     // make LSH
     let randomVec = generateLshParams(featureDim);
-    let uint: Uint8Array = new Uint8Array(randomVec);
-    let plane: string = btoa( String.fromCharCode.apply( null, Array.from(uint) ) );
-    console.log("randomVec is ", randomVec);
-    console.log("plane is ", plane);
-    console.log(stringToFloatArray(plane))
-    console.log(typeof(randomVec))
+    const param = new TextDecoder().decode(randomVec)
 
     // sign and send tx
     const injector = await web3FromSource(account.meta.source);;
@@ -70,14 +65,14 @@ export const addLshToBlockchain = async (account:InjectedAccountWithMeta, featur
           }) as WeightV2,
           storageDepositLimit,
         },
-        plane
+        param
       );
     const gasLimit = api?.registry.createType('WeightV2', gasRequired) as WeightV2   
     await contract.tx
         .registerLsh({
             gasLimit,
             storageDepositLimit
-        }, plane)
+        }, param)
         .signAndSend(account.address, {signer:injector.signer}, async (res) => {
             if (res.status.isInBlock) {
                 console.log('in a block')
@@ -143,14 +138,13 @@ export const addDataToBlockchain = async (account:InjectedAccountWithMeta, cid:s
 
 export const params: number[][] = [];
 
-const stringToFloatArray = (str: string) : number[] => {
-    const raw = atob(str);
-    const len = raw.length;
-    const bytes = new Uint8Array(len);
-    for (let i = 0; i < len; i++) {
-      bytes[i] = raw.charCodeAt(i);
+const bytesToFloatArray = (bytes: Uint8Array) : number[] => {
+    const array = new Float32Array(bytes.length / 4);
+    const view = new DataView(bytes.buffer);
+    for(let i = 0; i < array.length; i++) {
+      array[i] = view.getFloat32(i * 4); // read as float32
     }
-    return Array.from(new Float32Array(bytes.buffer));
+    return Array.from(array);
 }
 
 const fetchLshParams = async (contract: ContractPromise, address: string, index: number) => {
@@ -168,7 +162,7 @@ const fetchLshParams = async (contract: ContractPromise, address: string, index:
 
     if(output == null || output == undefined){ return; }
     const str = output.toHuman() as ReturnData;
-    params.push(stringToFloatArray(str.Ok));
+    params.push(bytesToFloatArray(new TextEncoder().encode(str.Ok)));
 }
 
 const fetchTotalLshAndParams = async (contract: ContractPromise, address: string) => {
