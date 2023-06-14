@@ -1,34 +1,17 @@
 import { PromptTemplate } from "langchain/prompts";
-import { ApiPromise } from "@polkadot/api";
-import { WsProvider } from "@polkadot/rpc-provider";
-import { BN, BN_ONE } from "@polkadot/util";
-import { Abi, ContractPromise } from "@polkadot/api-contract";
-import type { WeightV2 } from '@polkadot/types/interfaces'
-
-import { OpenAIStream, OpenAIStreamPayload } from '@/utils/OpenAIStream'
-import { embeddingQuery } from '@/utils/embeddings'
-import { retrieveFromIPFS } from '@/utils/ipfs';
-import lshQuery from '@/utils/lsh'
-import ABI from "@/abi/LshIndex.json";
-import { fetchParams, params } from "../addindex/route";
+import { OpenAIStream, OpenAIStreamPayload } from '@/features/OpenAIStream'
+import { embeddingQuery } from '@/features/embeddings'
+import { retrieveFromIPFS } from '@/features/ipfs';
+import { lshQuery } from '@/features/lsh'
+import { fetchCIDsFromBlockchain, fetchParams, params } from "@/features/contract";
 
 type RequestData = {
   message: string
 }
 
-
-type ReturnData = {
-  Ok: string
-}
-
-
 if (!process.env.OPENAI_API_KEY) {
   throw new Error('Missing env var from OpenAI')
 }
-
-const MAX_CALL_WEIGHT = new BN(5_000_000_000_000).isub(BN_ONE);
-const PROOFSIZE = new BN(1_000_000);
-const storageDepositLimit = null;
 
 export async function POST(request: Request) {
   const { message } = (await request.json()) as RequestData
@@ -38,33 +21,17 @@ export async function POST(request: Request) {
   }
 
   if(params.length === 0) {
+    console.log("call fetchParams");
     await fetchParams();
   }
+  
+  // embedding query and hash it by lsh
   const embedding = await embeddingQuery(message);
   const lsh = await lshQuery(embedding, params);
   const hash = parseInt(lsh.split('').join(''), 2);
-  
+
   // fetch CID from blockchain
-  const provider = new WsProvider('wss://rpc.shibuya.astar.network');
-  const api = new ApiPromise({ provider });
-  await api.isReady;
-  const abi = new Abi(ABI, api.registry.getChainProperties());
-  const contract = new ContractPromise(api, abi, "aLVQp8h5wbRoKFXsbCZtwQmRN8ygriZhGuphLeqsf6WKKN5");
-  const address = '5GNZgSUpbh1oeNUizq959yH52mvH7gokg4hiVijHiFBSpWCR'
-  const { result, output } = await contract.query.getData(
-    address,
-    {
-      gasLimit: api?.registry.createType('WeightV2', {
-        refTime: MAX_CALL_WEIGHT,
-        proofSize: PROOFSIZE,
-      }) as WeightV2,
-      storageDepositLimit,
-    },
-    hash
-  );
-  console.log("scucess");
-  console.log(output?.toHuman());
-  const cids = output?.toHuman() as ReturnData;
+  const cids = await fetchCIDsFromBlockchain(hash);
 
   let context:string = "";
   if(cids.Ok.length === 0) { 

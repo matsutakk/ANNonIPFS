@@ -9,17 +9,16 @@ export default function Header() {
   return (
     <Navbar
       fluid={true}
-      rounded={true}
+      className="fixed w-full" 
     >
       <Navbar.Brand href="/">
         <img
           src="/billy.svg"
           className="mr-3 h-6 sm:h-9"
-          alt="Flowbite Logo"
         />
         <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
-            {currentPath === "/" && <p>Search NFT with ChatGPT</p>}
-            {currentPath === "/docs" && <p>Documentation</p>}
+            {currentPath === "/" && <p>ChatNFT</p>}
+            {currentPath === "/docs" && <p>What is this?</p>}
             {currentPath === "/contributions" && <p>Contribute vectorDB indexes</p>}
         </span>
       </Navbar.Brand>
@@ -35,7 +34,7 @@ export default function Header() {
           href="/docs"
           active={currentPath == "/docs"}
         >
-          Docs
+          About
         </Navbar.Link>
         <Navbar.Link
           href="/contributions"

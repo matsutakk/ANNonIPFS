@@ -78,7 +78,7 @@ const Form = () => {
   })
 
   return (
-    <div className='flex justify-center'>
+    <div className='flex justify-center pt-14'>
 
       <div className='w-full mx-2 flex flex-col items-start gap-3 pt-6 last:mb-6 md:mx-auto md:max-w-3xl'>
         {isLoading
@@ -115,7 +115,7 @@ const Form = () => {
       >
         <textarea
           name='Message'
-          placeholder='どんなNFTをお探しですか？'
+          placeholder='What kind of NFT are you looking for?'
           ref={messageInput}
           onKeyDown={handleEnter}
           className='w-full resize-none bg-transparent outline-none pt-4 pl-4 translate-y-1 dark:text-white'
