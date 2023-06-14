@@ -15,7 +15,10 @@ export async function POST(request: Request) {
     }
 
     const res = await retrieveFromIPFS(cid);
-    const metadata = await res?.json();
+    //null check
+    if(res === undefined) { return new Response('No response from IPFS', { status: 400 }) }
+
+    const metadata = await res.json();
     console.log("meta data is ", metadata);;
 
     if(params.length == 0){

@@ -67,7 +67,6 @@ mod LshIndex {
 
         #[ink(message)]
         pub fn register_lsh(&mut self, lsh_param: Vec<u8>) {
-            assert!(lsh_param.len() == self.vector_dim as usize, "lsh_param length must be feature vector dimension");
             assert!(self.current_num_of_lsh!=self.max_num_of_lsh, "lsh_param cannot be registered anymore");
             self.lsh_params.insert(&self.current_num_of_lsh, &lsh_param);
             self.current_num_of_lsh += 1;
