@@ -29,9 +29,11 @@ export async function POST(request: Request) {
   const embedding = await embeddingQuery(message);
   const lsh = await lshQuery(embedding, params);
   const hash = parseInt(lsh.split('').join(''), 2);
+  console.log("hash is ", hash);
 
   // fetch CID from blockchain
   const cids = await fetchCIDsFromBlockchain(hash);
+  console.log("cids is ", cids);
 
   let context:string = "";
   if(cids.Ok.length === 0) { 
