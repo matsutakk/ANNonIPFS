@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0x758cd1d29dc912b61b8d0a46b4c8db47d97a8afa54727241043c0ad769f84f2a",
+    "hash": "0x8c1a8a7a8d14f0ce416f89c4176653e9b3cd50d954d7caadf7ac1e49431cdd8c",
     "language": "ink! 4.2.0",
     "compiler": "rustc 1.69.0-nightly",
     "build_info": {
@@ -23,7 +23,26 @@
   "spec": {
     "constructors": [
       {
-        "args": [],
+        "args": [
+          {
+            "label": "max_num_of_lsh",
+            "type": {
+              "displayName": [
+                "u8"
+              ],
+              "type": 2
+            }
+          },
+          {
+            "label": "vector_dim",
+            "type": {
+              "displayName": [
+                "u32"
+              ],
+              "type": 4
+            }
+          }
+        ],
         "default": false,
         "docs": [],
         "label": "new",
@@ -33,7 +52,7 @@
             "ink_primitives",
             "ConstructorResult"
           ],
-          "type": 4
+          "type": 5
         },
         "selector": "0x9bae9d5e"
       }
@@ -44,38 +63,38 @@
         "displayName": [
           "AccountId"
         ],
-        "type": 11
+        "type": 12
       },
       "balance": {
         "displayName": [
           "Balance"
         ],
-        "type": 13
+        "type": 14
       },
       "blockNumber": {
         "displayName": [
           "BlockNumber"
         ],
-        "type": 7
+        "type": 4
       },
       "chainExtension": {
         "displayName": [
           "ChainExtension"
         ],
-        "type": 16
+        "type": 17
       },
       "hash": {
         "displayName": [
           "Hash"
         ],
-        "type": 14
+        "type": 15
       },
       "maxEventTopics": 4,
       "timestamp": {
         "displayName": [
           "Timestamp"
         ],
-        "type": 15
+        "type": 16
       }
     },
     "events": [],
@@ -84,7 +103,7 @@
         "ink",
         "LangError"
       ],
-      "type": 6
+      "type": 7
     },
     "messages": [
       {
@@ -95,7 +114,7 @@
               "displayName": [
                 "u32"
               ],
-              "type": 7
+              "type": 4
             }
           },
           {
@@ -118,7 +137,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 4
+          "type": 5
         },
         "selector": "0x3fade33f"
       },
@@ -130,7 +149,7 @@
               "displayName": [
                 "u32"
               ],
-              "type": 7
+              "type": 4
             }
           }
         ],
@@ -178,23 +197,7 @@
         "args": [],
         "default": false,
         "docs": [],
-        "label": "get_all_lsh_param",
-        "mutates": false,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 8
-        },
-        "selector": "0x3a7d29da"
-      },
-      {
-        "args": [],
-        "default": false,
-        "docs": [],
-        "label": "get_total_lsh",
+        "label": "get_current_num_of_lsh",
         "mutates": false,
         "payable": false,
         "returnType": {
@@ -204,7 +207,39 @@
           ],
           "type": 10
         },
-        "selector": "0x6f5ac7e0"
+        "selector": "0x35a9ff70"
+      },
+      {
+        "args": [],
+        "default": false,
+        "docs": [],
+        "label": "get_max_num_of_lsh",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 10
+        },
+        "selector": "0xf6aef33f"
+      },
+      {
+        "args": [],
+        "default": false,
+        "docs": [],
+        "label": "get_vector_dim",
+        "mutates": false,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 11
+        },
+        "selector": "0xc268bc55"
       },
       {
         "args": [
@@ -228,7 +263,7 @@
             "ink",
             "MessageResult"
           ],
-          "type": 4
+          "type": 5
         },
         "selector": "0x553d8369"
       }
@@ -288,7 +323,25 @@
                   "ty": 2
                 }
               },
-              "name": "total_lsh"
+              "name": "current_num_of_lsh"
+            },
+            {
+              "layout": {
+                "leaf": {
+                  "key": "0x00000000",
+                  "ty": 2
+                }
+              },
+              "name": "max_num_of_lsh"
+            },
+            {
+              "layout": {
+                "leaf": {
+                  "key": "0x00000000",
+                  "ty": 4
+                }
+              },
+              "name": "vector_dim"
             }
           ],
           "name": "LshIndex"
@@ -338,12 +391,20 @@
       "id": 4,
       "type": {
         "def": {
+          "primitive": "u32"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "type": {
+        "def": {
           "variant": {
             "variants": [
               {
                 "fields": [
                   {
-                    "type": 5
+                    "type": 6
                   }
                 ],
                 "index": 0,
@@ -352,7 +413,7 @@
               {
                 "fields": [
                   {
-                    "type": 6
+                    "type": 7
                   }
                 ],
                 "index": 1,
@@ -364,11 +425,11 @@
         "params": [
           {
             "name": "T",
-            "type": 5
+            "type": 6
           },
           {
             "name": "E",
-            "type": 6
+            "type": 7
           }
         ],
         "path": [
@@ -377,7 +438,7 @@
       }
     },
     {
-      "id": 5,
+      "id": 6,
       "type": {
         "def": {
           "tuple": []
@@ -385,7 +446,7 @@
       }
     },
     {
-      "id": 6,
+      "id": 7,
       "type": {
         "def": {
           "variant": {
@@ -401,14 +462,6 @@
           "ink_primitives",
           "LangError"
         ]
-      }
-    },
-    {
-      "id": 7,
-      "type": {
-        "def": {
-          "primitive": "u32"
-        }
       }
     },
     {
@@ -429,7 +482,7 @@
               {
                 "fields": [
                   {
-                    "type": 6
+                    "type": 7
                   }
                 ],
                 "index": 1,
@@ -445,7 +498,7 @@
           },
           {
             "name": "E",
-            "type": 6
+            "type": 7
           }
         ],
         "path": [
@@ -471,7 +524,7 @@
               {
                 "fields": [
                   {
-                    "type": 6
+                    "type": 7
                   }
                 ],
                 "index": 1,
@@ -487,7 +540,7 @@
           },
           {
             "name": "E",
-            "type": 6
+            "type": 7
           }
         ],
         "path": [
@@ -513,7 +566,7 @@
               {
                 "fields": [
                   {
-                    "type": 6
+                    "type": 7
                   }
                 ],
                 "index": 1,
@@ -529,7 +582,7 @@
           },
           {
             "name": "E",
-            "type": 6
+            "type": 7
           }
         ],
         "path": [
@@ -541,10 +594,52 @@
       "id": 11,
       "type": {
         "def": {
+          "variant": {
+            "variants": [
+              {
+                "fields": [
+                  {
+                    "type": 4
+                  }
+                ],
+                "index": 0,
+                "name": "Ok"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 7
+                  }
+                ],
+                "index": 1,
+                "name": "Err"
+              }
+            ]
+          }
+        },
+        "params": [
+          {
+            "name": "T",
+            "type": 4
+          },
+          {
+            "name": "E",
+            "type": 7
+          }
+        ],
+        "path": [
+          "Result"
+        ]
+      }
+    },
+    {
+      "id": 12,
+      "type": {
+        "def": {
           "composite": {
             "fields": [
               {
-                "type": 12,
+                "type": 13,
                 "typeName": "[u8; 32]"
               }
             ]
@@ -558,7 +653,7 @@
       }
     },
     {
-      "id": 12,
+      "id": 13,
       "type": {
         "def": {
           "array": {
@@ -569,7 +664,7 @@
       }
     },
     {
-      "id": 13,
+      "id": 14,
       "type": {
         "def": {
           "primitive": "u128"
@@ -577,13 +672,13 @@
       }
     },
     {
-      "id": 14,
+      "id": 15,
       "type": {
         "def": {
           "composite": {
             "fields": [
               {
-                "type": 12,
+                "type": 13,
                 "typeName": "[u8; 32]"
               }
             ]
@@ -597,7 +692,7 @@
       }
     },
     {
-      "id": 15,
+      "id": 16,
       "type": {
         "def": {
           "primitive": "u64"
@@ -605,7 +700,7 @@
       }
     },
     {
-      "id": 16,
+      "id": 17,
       "type": {
         "def": {
           "variant": {}

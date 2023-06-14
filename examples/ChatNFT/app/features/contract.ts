@@ -57,11 +57,11 @@ function uint8ArrayToBase64(buffer: Uint8Array) {
     let binary = '';
     const bytes = [].slice.call(new Uint8Array(buffer));
     bytes.forEach((b: number) => binary += String.fromCharCode(b));
-    return window.btoa(binary);
+    return btoa(binary);
 }
 
 function base64ToUint8Array(base64String: string) {
-    const binaryString = window.atob(base64String);
+    const binaryString = atob(base64String);
     const len = binaryString.length;
     const bytes = new Uint8Array(len);
     for (let i = 0; i < len; i++)    {
@@ -120,6 +120,8 @@ export const addDataToBlockchain = async (account:InjectedAccountWithMeta, cid:s
             cid: cid,
         }),
     })
+
+    console.log(`Got a response! [${response.status}] ${response.statusText}`)
   
     if (!response.ok) {
         throw new Error(response.statusText)
@@ -185,7 +187,7 @@ const fetchLshParams = async (contract: ContractPromise, address: string, index:
 }
 
 const fetchTotalLshAndParams = async (contract: ContractPromise, address: string) => {
-    const { result, output } = await contract.query.getTotalLsh(
+    const { result, output } = await contract.query.getCurrentNumOfLsh(
         address,
         {
             gasLimit: contract.api?.registry.createType('WeightV2', {
