@@ -37,11 +37,12 @@ export async function POST(request: Request) {
 
   let context:string = "";
   if(cids.Ok.length === 0) { 
-    context = "マッチングが見つからなかったため、謝罪と違う入力の依頼をお客様にお願いいたします。"
+    context = "Since we could not find a match, we ask the customer to apologize and request a different input."
   }
   else{
     const res = await retrieveFromIPFS(cids.Ok[0]);
     console.log(res);
+    if(res === undefined) { return new Response('No response from IPFS', { status: 400 }) }
   
     const decoder = new TextDecoder();
     let currentResponse: string[] = []
@@ -59,33 +60,26 @@ export async function POST(request: Request) {
     if(context.length > 1000) { return new Response('context is too long', { status: 500 }) }
   }
 
+  console.log("making prompt")
+
   // make prompt from cid and contents
   const promptTemplate = new PromptTemplate({
     inputVariables: ["context","message"],
     template: `
-    あなたは与えられた入力に対して、おすすめNFTを紹介する超優秀なAIです。
-    マッチングNFT情報をもとに、入力:「{message}」にマッチするおすすめNFTに関する情報を返信してください。
-    マッチングNFT情報は、私が予め取得しておいた、入力にマッチしていそうと思われるNFTのmetadataをまとめたものです。
+    You are a superb AI that recommends NFTs for a given input. Based on the matching NFT information that I will give to you, please reply with information about recommended NFTs that match the input: "{message}". 
+    The matching NFT information is a summary of NFT metadata that I have obtained in advance that seems to match the input. 
 
-    以下のルールを守って回答を作成してください。
-    ルール1 マッチングNFT情報はjsonなので、そのまま返さず、一般成人が理解できるような自然言語にしてください。必要に応じて見やすいように出力してください。
-    ルール2 マッチングNFT情報にimageリンクがある場合、そのリンクのipfs://の部分を取り除き、「http://ipfs.io/ipfs/リンク内容」として出力してください。
-    ルール3 私のこの指示の言葉遣いは参考にせず、なるべく自然な言葉で返してください。
-    ルール4 マッチングNFT情報が、{message}の情報とあまり合致しない場合、追加の情報を求める返信をしてください。
-    ルール5 マッチングNFT情報にattributesがある場合、「trait_typeの値；valueの値」を改行して出力してください。例えば、"trait_type:Type, value:Human"の場合、以下のような形式となります。
+    Please follow the rules below to create your response. 
+    Rule 1: Matching NFT information is in json, so please do not return it as is. Please output the information in an easy-to-read format. 
+    Rule 2: If the matching NFT information contains image links, please add the image link to your response end after new line.
+    Rule 3: Please do not refer to my wording of this instruction, please make response message in as natural a language as possible. 
+    Rule 4: If the matching NFT information does not match the given input very well, please reply asking for additional information.
+    Rule 5: Matching NFT information is in json. If the json have key "attributes", please output json key and its value. For example, in the case of "trait_type:Type, value:Human", the format is "Type: Human Hair: White"
     
-    Type: Human
-    Hair: White
-    以下省略
-
-    必要であれば、回答例も参考にしてください。
-    回答例:「
-      条件に合うNFTをお勧めいたします。
-      ....
-    」
-
-    以下がマッチング情報です。それでは、お客様への回答お願いいたします。
-    マッチングNFT情報:
+    Beginning of sample answer: "We can recommend an NFT that meets your requirements. .... "
+    
+    Below is the matching information. Now, please respond to the customer. 
+    Matching NFT information:.
     {context}
     `,
   });
@@ -105,5 +99,7 @@ export async function POST(request: Request) {
   }
 
   const stream = await OpenAIStream(payload);
+
+  console.log("returning respons")
   return new Response(stream);
 }

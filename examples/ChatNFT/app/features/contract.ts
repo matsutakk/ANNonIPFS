@@ -124,7 +124,8 @@ export const addDataToBlockchain = async (account:InjectedAccountWithMeta, cid:s
     console.log(`Got a response! [${response.status}] ${response.statusText}`)
   
     if (!response.ok) {
-        throw new Error(response.statusText)
+        alert(`Error: ${response.status} ${response.statusText}`)
+        return
     }
 
     const data = await response.json();

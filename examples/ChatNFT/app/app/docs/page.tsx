@@ -28,15 +28,15 @@ export default function About() {
         </div>
       </aside>
       
-      <div className="h-full">
-        <section id="overview" className="mb-8 sm:ml-72 mt-20">
+      <div className="w-full">
+        <div id="overview" className="mb-8 sm:ml-72 mt-20">
           <h2 className="text-2xl font-bold mb-2">Overview</h2>
           <p>Overview details...</p>
-        </section>
-        <section id="technologies" className="mb-8 sm:ml-72">
+        </div>
+        <div id="technologies" className="mb-8 sm:ml-72">
           <h2 className="text-2xl font-bold mb-2">Technologies</h2>
           <p>Technologies details...</p>
-        </section>
+        </div>
         <section id="source-code" className="mb-8 sm:ml-72">
           <h2 className="text-2xl font-bold mb-2">Source code</h2>
           <p>Source code details...</p>

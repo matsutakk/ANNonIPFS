@@ -7,6 +7,10 @@ type RequestData = {
     cid: string
 }
 
+type ValueObject = {
+    value: string;
+};
+
 export async function POST(request: Request) {
     const { cid } = (await request.json()) as RequestData
     
@@ -15,17 +19,31 @@ export async function POST(request: Request) {
     }
 
     const res = await retrieveFromIPFS(cid);
-    //null check
     if(res === undefined) { return new Response('No response from IPFS', { status: 400 }) }
 
     const metadata = await res.json();
-    console.log("meta data is ", metadata);;
+    console.log("meta data is ", metadata);
+    console.log(typeof metadata)
+    // const text  = Object.values(metadata).join(', ');
+    let values = Object.values(metadata).flat();
+    
+    values = values.map(value => {
+        if (typeof value === "object" && value !== null) {
+            return (value as ValueObject).value;
+        } else {
+            return value as string;
+        }
+    });
+
+    const text = values.join(', ');
+    console.log("text is", text);
 
     if(params.length == 0){
         await fetchParams();
     }
 
-    const embedding = await embeddingQuery(JSON.stringify(metadata));
+    // const embedding = await embeddingQuery(JSON.stringify(metadata));
+    const embedding = await embeddingQuery(text);
     const hash = await lshQuery(embedding, params);
 
     return new Response(
