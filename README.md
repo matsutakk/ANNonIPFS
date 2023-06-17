@@ -40,5 +40,5 @@ comming soon.
 comming soon.
 
 ## Todo
-- [ ] Update smart contract
-- [ ] Make data and contribution part
+- [] presen
+- [] improve
