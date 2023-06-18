@@ -30,12 +30,12 @@ export default function Header() {
         >
           Home
         </Navbar.Link>
-        <Navbar.Link
+        {/* <Navbar.Link
           href="/docs"
           active={currentPath == "/docs"}
         >
           About
-        </Navbar.Link>
+        </Navbar.Link> */}
         <Navbar.Link
           href="/contributions"
           active={currentPath == "/contributions"}
