@@ -4,9 +4,9 @@ if (!process.env.OPENAI_API_KEY) {
     throw new Error('Missing env var from OpenAI')
 }
 
-if (!process.env.CLIP_API_KEY) {
-    throw new Error('Missing env var from Clip as a Service')
-}
+// if (!process.env.CLIP_API_KEY) {
+//     throw new Error('Missing env var from Clip as a Service')
+// }
 
 export const embeddingQuery = async (text: string) => {
     const openAIembeddings: OpenAIEmbeddings = new OpenAIEmbeddings({
