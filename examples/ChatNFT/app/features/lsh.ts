@@ -13,6 +13,17 @@ const gaussianRandom = (mean=0, stdev=1) => {
   return z * stdev + mean;
 }
 
+export function cosineSimilarity(a:number[], b:number[]) {
+  let dotProduct = a.map((item, index) => item * b[index]).reduce((prev, curr) => prev + curr, 0);
+  let magnitudeA = Math.sqrt(a.map(item => item * item).reduce((prev, curr) => prev + curr, 0));
+  let magnitudeB = Math.sqrt(b.map(item => item * item).reduce((prev, curr) => prev + curr, 0));
+  
+  if (magnitudeA === 0 || magnitudeB === 0) {
+    return 0; // Handling the edge case of zero-vector.
+  } else {
+    return dotProduct / (magnitudeA * magnitudeB);
+  }
+}
 export function generateLshParams(dim: number) {
   const plane: number[] = [];
   for(let j = 0; j < dim; j++){
@@ -31,5 +42,6 @@ export function generateLshParams(dim: number) {
 }
 
 export async function lshQuery(featureVector: number[], params: number[][]): Promise<string>{
+  console.log(params.length);
   return params.map(plane => dotProduct(plane, featureVector) > 0 ? 1 : 0).join('');
 };

@@ -28,6 +28,7 @@ export default function Home() {
         else{
             setLoading(true);
             await addLshToBlockchain(account, 1536); // 1536 is the dimension of the vector we are using. see OpenAI text-ada-002
+            // await addLshToBlockchain(account, 512); // 512 is CLIP encoder output dimension
             setLoading(false);
         }
     }

@@ -8,7 +8,9 @@ import { generateLshParams } from "./lsh";
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 
 const address = '5GNZgSUpbh1oeNUizq959yH52mvH7gokg4hiVijHiFBSpWCR';
-const contractAddress = "XfcBk389kBFZ4EnuEsWaJEMYPNmEc5jWLiHCJF12XESyxKQ"
+const contractAddress = "XfcBk389kBFZ4EnuEsWaJEMYPNmEc5jWLiHCJF12XESyxKQ" // original
+// const contractAddress = "WaV5LgDR8EMZzffNYo5nS7N7JiVV3SFsbzkcMqWCZB6PBm5" // fixed metadata input problem
+// const contractAddress = "WNjKb2u5hEYxfBwt9GzYewRqeD57Pp9uvdiBdyVjYQS6J3f" // CLIP
 const providerUrl = 'wss://rpc.shibuya.astar.network'
 
 const MAX_CALL_WEIGHT = new BN(5_000_000_000_000).isub(BN_ONE);
@@ -95,19 +97,25 @@ export const addLshToBlockchain = async (account:InjectedAccountWithMeta, featur
         },
         param
       );
-    const gasLimit = api?.registry.createType('WeightV2', gasRequired) as WeightV2   
-    await contract.tx
-        .registerLsh({
-            gasLimit,
-            storageDepositLimit
-        }, param)
-        .signAndSend(account.address, {signer:injector.signer}, async (res) => {
-            if (res.status.isInBlock) {
-                console.log('in a block')
-            } else if (res.status.isFinalized) {
-                alert('Thank you for your contribution!');
-            }
-        });
+    const gasLimit = api?.registry.createType('WeightV2', gasRequired) as WeightV2
+
+    const transactionPromise = new Promise((resolve, reject) => {
+        contract.tx
+            .registerLsh({
+                gasLimit,
+                storageDepositLimit
+            }, param)
+            .signAndSend(account.address, {signer:injector.signer}, async (res) => {
+                if (res.status.isInBlock) {
+                    console.log('in a block')
+                } else if (res.status.isFinalized) {
+                    alert('Thank you for your contribution!');
+                    resolve(void 0);
+                }
+            });
+    });
+        
+    await transactionPromise;
 }
 
 export const addDataToBlockchain = async (account:InjectedAccountWithMeta, cid:string) => {
@@ -152,7 +160,21 @@ export const addDataToBlockchain = async (account:InjectedAccountWithMeta, cid:s
             cid,
         );
     const gasLimit = api?.registry.createType('WeightV2', gasRequired) as WeightV2   
-    await contract.tx
+    // await contract.tx
+    //     .addData({
+    //         gasLimit,
+    //         storageDepositLimit
+    //     }, data.hash, cid)
+    //     .signAndSend(account.address, {signer:injector.signer}, async (res) => {
+    //         if (res.status.isInBlock) {
+    //             console.log('in a block')
+    //         } else if (res.status.isFinalized) {
+    //             alert('Thank you for your contribution!');
+    //         }
+    //     });
+
+    const transactionPromise = new Promise((resolve, reject) => {
+        contract.tx
         .addData({
             gasLimit,
             storageDepositLimit
@@ -162,8 +184,12 @@ export const addDataToBlockchain = async (account:InjectedAccountWithMeta, cid:s
                 console.log('in a block')
             } else if (res.status.isFinalized) {
                 alert('Thank you for your contribution!');
+                resolve(void 0);
             }
         });
+    });
+        
+    await transactionPromise;
 }
 
 
@@ -203,6 +229,22 @@ const fetchTotalLshAndParams = async (contract: ContractPromise, address: string
     for(let idx = 0; idx < Number(totalLsh.Ok); idx++){
         await fetchLshParams(contract, address, idx);
     }
+}
+
+const fetchVectorDim = async (contract: ContractPromise, address: string) => {
+    const { result, output } = await contract.query.getVectorDim(
+        address,
+        {
+            gasLimit: contract.api?.registry.createType('WeightV2', {
+                refTime: MAX_CALL_WEIGHT,
+                proofSize: PROOFSIZE,
+            }) as WeightV2,
+            storageDepositLimit,
+        }
+    );
+
+    const dim = output?.toHuman() as ReturnData;
+    return Number(dim.Ok);
 }
 
 export const fetchParams =async () => {
