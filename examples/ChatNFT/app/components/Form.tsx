@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import useSWR from 'swr'
 import Image from 'next/image';
 
@@ -23,6 +23,7 @@ const Form = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    setResponse([])
     const message = messageInput.current?.value
     if (message !== undefined) {
       setResponse((prev) => [...prev, message])
@@ -33,7 +34,7 @@ const Form = () => {
       return
     }
 
-    const response = await fetch('/api/search', {
+    const searchResult = await fetch('/api/search', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -44,11 +45,12 @@ const Form = () => {
     })
 
 
-    if (!response.ok) {
-      throw new Error(response.statusText)
+    if (!searchResult.ok) {
+      throw new Error(searchResult.statusText)
     }
 
-    const data = response.body
+    const data = searchResult.body
+
     if (!data) {
       return
     }
@@ -64,7 +66,6 @@ const Form = () => {
       const { value, done: doneReading } = await reader.read()
       done = doneReading
       const chunkValue = decoder.decode(value)
-      // currentResponse = [...currentResponse, message, chunkValue];
       currentResponse = [...currentResponse, chunkValue]
       setResponse((prev) => [...prev.slice(0, -1), currentResponse.join('')])
     }
@@ -87,6 +88,27 @@ const Form = () => {
       <div className='w-full mx-2 mb-72 flex flex-col items-start gap-3 pt-6 last:mb-6 overflow-auto md:mx-auto md:max-w-3xl'>
         {isLoading
           ? response.map((item: any, index: number) => {
+              let ipfsLink = item.matchAll(/ipfs:\/\/\S+|ipfs\/\S+/g);
+              const ipfsImages = Array.from(ipfsLink).map((item:any)=>{
+                let path = item[0];
+                path = path.replace('ipfs://', '');
+                path = path.replace('ipfs/','');
+                console.log(path)
+                path = "https://ipfs.io/ipfs/" + path;
+                while(path[path.length-1]=='.') path = path.substring(0, path.length-1);
+                return <Image
+                          src={path}
+                          alt="Sorry, get image error"
+                          width={300}
+                          height={300}
+                        />
+              })
+              const lines = item.split('\n').map((line:any, index:any) => (
+                <React.Fragment key={index}>
+                  {line}
+                  <br />
+                </React.Fragment>
+              ));
               return (
                 <div
                   key={index}
@@ -94,19 +116,34 @@ const Form = () => {
                     index % 2 === 0 ? 'bg-blue-500' : 'bg-gray-500'
                   } p-3 rounded-lg`}
                 >
-                  <p className='text-white'>{item}</p>
+                  <p className='text-white'>{lines}</p>
+                  {ipfsImages.length>0?ipfsImages:""}
                 </div>
               )
             })
           : response
           ? response.map((item: string, index: number) => {
-            let ipfsLink = item.match(/ipfs:\/\/\S+/);
-            let path = "";
-            if (ipfsLink) {
-              path = ipfsLink[0].replace('ipfs://', '');
-              path = "https://ipfs.io/ipfs/" + path;
-              console.log(path);
-            }
+              let ipfsLink = item.matchAll(/ipfs:\/\/\S+|ipfs\/\S+/g);
+              const ipfsImages = Array.from(ipfsLink).map((item)=>{
+                let path = item[0];
+                path = path.replace('ipfs://', '');
+                path = path.replace('ipfs/','');
+                console.log(path)
+                path = "https://ipfs.io/ipfs/" + path;
+                while(path[path.length-1]=='.') path = path.substring(0, path.length-1);
+                return <Image
+                          src={path}
+                          alt="Sorry, get image error"
+                          width={300}
+                          height={300}
+                        />
+              })
+              const lines = item.split('\n').map((line, index) => (
+                <React.Fragment key={index}>
+                  {line}
+                  <br />
+                </React.Fragment>
+              ));
               return (
                 <div
                   key={index}
@@ -114,15 +151,8 @@ const Form = () => {
                     index % 2 === 0 ? 'bg-blue-500' : 'bg-gray-500'
                   } p-3 rounded-lg`}
                 >
-                  <p className='text-white'>{item}</p>
-                  {index%2!=0 && ipfsLink ? 
-                    <Image
-                      src={path}
-                      alt="Sorry, no image found"
-                      width={300}  // or the width you want
-                      height={300} // or the height you want
-                    /> :  ""
-                  }
+                  <p className='text-white'>{lines}</p>
+                  {ipfsImages.length>0?ipfsImages:""}
                 </div>
               )
             })
@@ -134,7 +164,7 @@ const Form = () => {
       >
         <textarea
           name='Message'
-          placeholder='What kind of NFTs are you looking for? (e.g. Gif, Metaverse, Blue Sneakers, etc.)'
+          placeholder='What kind of NFTs are you looking for?'
           ref={messageInput}
           onKeyDown={handleEnter}
           className='w-full resize-none bg-transparent outline-none pt-4 pl-4 translate-y-1 dark:text-white'
