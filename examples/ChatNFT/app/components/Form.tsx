@@ -89,7 +89,7 @@ const Form = () => {
         {isLoading
           ? response.map((item: any, index: number) => {
               let ipfsLink = item.matchAll(/ipfs:\/\/\S+|ipfs\/\S+/g);
-              const ipfsImages = Array.from(ipfsLink).map((item:any)=>{
+              const ipfsImages = Array.from(ipfsLink).map((item:any,index)=>{
                 let path = item[0];
                 path = path.replace('ipfs://', '');
                 path = path.replace('ipfs/','');
@@ -97,6 +97,7 @@ const Form = () => {
                 path = "https://ipfs.io/ipfs/" + path;
                 while(path[path.length-1]=='.') path = path.substring(0, path.length-1);
                 return <Image
+                          key={index}
                           src={path}
                           alt="Sorry, get image error"
                           width={300}
@@ -124,7 +125,7 @@ const Form = () => {
           : response
           ? response.map((item: string, index: number) => {
               let ipfsLink = item.matchAll(/ipfs:\/\/\S+|ipfs\/\S+/g);
-              const ipfsImages = Array.from(ipfsLink).map((item)=>{
+              const ipfsImages = Array.from(ipfsLink).map((item, index)=>{
                 let path = item[0];
                 path = path.replace('ipfs://', '');
                 path = path.replace('ipfs/','');
@@ -132,6 +133,7 @@ const Form = () => {
                 path = "https://ipfs.io/ipfs/" + path;
                 while(path[path.length-1]=='.') path = path.substring(0, path.length-1);
                 return <Image
+                          key={index}
                           src={path}
                           alt="Sorry, get image error"
                           width={300}
