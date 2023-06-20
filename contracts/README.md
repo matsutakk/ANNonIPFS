@@ -1,7 +1,7 @@
 ## Dependency
-You need set up ink! environment.
-https://use.ink/
-https://docs.astar.network/docs/build/environment/ink_environment
+You need set up ink! environment.  
+https://use.ink/  
+https://docs.astar.network/docs/build/environment/ink_environment  
 
 ## Test
 ```shell
