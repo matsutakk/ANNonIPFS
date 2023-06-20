@@ -1,12 +1,7 @@
-# 概要
-WASMコントラクト
-
 ## Dependency
-You need ink!  
+You need set up ink! environment.
 https://use.ink/
-
-Astar documentation is good to start.
-https://docs.astar.network/docs/build/wasm/smart-contract-wasm
+https://docs.astar.network/docs/build/environment/ink_environment
 
 ## Test
 ```shell
@@ -14,8 +9,16 @@ cargo test
 ```
 
 ## Build
-You need this.
-
 ```
 cargo contract build
 ```
+
+## Deploy
+- You need polkadot{.js} wallet. https://polkadot.js.org/extension/  
+- You need faucet to deploy. Please go to https://portal.astar.network/shibuya-testnet/assets and get faucet.
+
+After building, you will get three file.  
+![image](https://github.com/matsutakk/ANNonIPFS/assets/28383051/8ca76db3-3af8-44b5-bd8f-4082c601784d)
+
+Please access https://polkadot.js.org/apps/#/explorer, select network and deploy contract.
+
