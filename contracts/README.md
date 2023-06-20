@@ -12,13 +12,12 @@ cargo test
 ```
 cargo contract build
 ```
+After building, you will get three files.  
+![image](https://github.com/matsutakk/ANNonIPFS/assets/28383051/8ca76db3-3af8-44b5-bd8f-4082c601784d)
 
 ## Deploy
 - You need polkadot{.js} wallet. https://polkadot.js.org/extension/  
 - You need faucet to deploy. Please go to https://portal.astar.network/shibuya-testnet/assets and get faucet.
-
-After building, you will get three files.  
-![image](https://github.com/matsutakk/ANNonIPFS/assets/28383051/8ca76db3-3af8-44b5-bd8f-4082c601784d)
 
 Please access https://polkadot.js.org/apps/#/explorer, select network and deploy contract.
 
