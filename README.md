@@ -3,3 +3,6 @@
 .  
 ├── contracts (IPFS上のデータインデックスを保持するWASMコントラクト)  
 ├── examples/ChatNFT (AI+CRYPTO HACKATHONで作成したプロダクト)  
+
+
+Vercelは一旦止めてます。
